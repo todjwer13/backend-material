@@ -18,7 +18,7 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
       secretOrKey: configService.get<string>('JWT_SECRET'),
     });
   }
-
+  // JWT 유효성 검사
   async validate(payload: TokenPayload): Promise<User> {
     const { sub, jti } = payload;
     return this.userService.validateUser(sub, jti);

@@ -13,7 +13,7 @@ export class TokenBlacklistRepository extends Repository<TokenBlacklist> {
   ) {
     super(repo.target, repo.manager, repo.queryRunner);
   }
-
+  // 토큰 블랙리스트 추가
   async addToken(
     token: string,
     jti: string,
@@ -27,12 +27,12 @@ export class TokenBlacklistRepository extends Repository<TokenBlacklist> {
     blacklistedToken.expiresAt = expiresAt;
     await this.save(blacklistedToken);
   }
-
+  // JWT id로 토큰이 블랙리스트에 있는지 확인
   async isTokenBlacklisted(jti: string): Promise<boolean> {
     const foundToken = await this.findOne({ where: { jti } });
     return !!foundToken;
   }
-
+  // 만료된 토큰을 삭제
   async removeExpiredTokens(): Promise<void> {
     await this.createQueryBuilder()
       .delete()

@@ -28,5 +28,11 @@ module.exports = {
         ignoreDeclarationSort: true,
       },
     ],
+    'prettier/prettier': [
+      'error',
+      {
+        endOfLine: 'auto',
+      },
+    ],
   },
 };

@@ -14,11 +14,11 @@ export class UserRepository extends Repository<User> {
   ) {
     super(repo.target, repo.manager, repo.queryRunner);
   }
-
+  // 이메일로 사용ㅎ자 조회
   async findOneByEmail(email: string): Promise<User> {
     return this.repo.findOneBy({ email });
   }
-
+  // 사용자 생성
   async createUser(dto: CreateUserDto, hashedPassword: string): Promise<User> {
     const user = new User();
     user.name = dto.name;

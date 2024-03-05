@@ -15,6 +15,7 @@ export class AuthController {
     private readonly userService: UserService,
   ) {}
 
+  // 로그인 처리, 사용자 인증
   @Post('login')
   async login(
     @Req() req,
@@ -34,6 +35,7 @@ export class AuthController {
     );
   }
 
+  // 새로운 사용자 등록, 사용자의 정보 반환
   @Post('signup')
   async signup(@Body() createUserDto: CreateUserDto): Promise<SignupResDto> {
     const user = await this.userService.createUser(createUserDto);
@@ -45,6 +47,7 @@ export class AuthController {
     };
   }
 
+  // 토큰을 새로 발급
   @Post('refresh')
   async refresh(@Body() dto: RefreshReqDto): Promise<string> {
     return this.authService.refreshAccessToken(dto.refreshToken);

@@ -13,7 +13,7 @@ export class IssuedCouponRepository extends Repository<IssuedCoupon> {
   ) {
     super(repo.target, repo.manager, repo.queryRunner);
   }
-
+  // 쿠폰 사용 처리및 업데이트된 쿠폰 반환
   use(issuedCoupon: IssuedCoupon): Promise<IssuedCoupon> {
     issuedCoupon.use();
     return this.save(issuedCoupon);

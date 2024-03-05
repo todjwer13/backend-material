@@ -13,7 +13,7 @@ export class PointLogRepository extends Repository<PointLog> {
   ) {
     super(repo.target, repo.manager, repo.queryRunner);
   }
-
+  // 포인트 이력 생성 및 변경 사항 저장 및 이력 반환
   use(point: Point, amountToUse: number, reason: string): Promise<PointLog> {
     const pointLog = new PointLog();
     pointLog.point = point;

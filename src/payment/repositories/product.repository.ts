@@ -16,7 +16,7 @@ export class ProductRepository extends Repository<Product> {
 
   async getProductsByIds(productIds: string[]): Promise<Product[]> {
     return await this.findBy({
-      id: In(productIds),
+      id: In(productIds), // ID로 제품 검색
     });
   }
 }

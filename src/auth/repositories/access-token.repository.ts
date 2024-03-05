@@ -13,7 +13,7 @@ export class AccessTokenRepository extends Repository<AccessToken> {
   ) {
     super(repo.target, repo.manager, repo.queryRunner);
   }
-
+  // 엑세스 토큰 저장
   async saveAccessToken(
     jti: string,
     user: User,
@@ -28,7 +28,7 @@ export class AccessTokenRepository extends Repository<AccessToken> {
     accessToken.isRevoked = false;
     return this.save(accessToken);
   }
-
+  // JWT id로 엑세스 토큰 조회
   async findOneByJti(jti: string): Promise<AccessToken> {
     return this.findOneBy({ jti, isRevoked: false });
   }

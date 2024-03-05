@@ -45,6 +45,7 @@ export class PaymentService {
 
   @Transactional()
   async completeOrder(orderId: string): Promise<Order> {
+    // 주문 완료 처리
     return this.orderRepository.completeOrder(orderId);
   }
 
@@ -54,9 +55,11 @@ export class PaymentService {
     finalAmount: number,
     shippingAddress?: string,
   ): Promise<Order> {
+    // 배송 정보 생성
     const shippingInfo = shippingAddress
       ? await this.shippingInfoRepository.createShippingInfo(shippingAddress)
       : null;
+    // 주문 생성
     return await this.orderRepository.createOrder(
       userId,
       orderItems,
@@ -66,12 +69,17 @@ export class PaymentService {
   }
 
   private async calculateTotalAmount(orderItems: OrderItem[]): Promise<number> {
+    // 총 주문 금액 계산 초기화
     let totalAmount = 0;
-
+    // 주문에 포함된 상품의 id 추출
     const productIds = orderItems.map((item) => item.productId);
+    // 상품 서비스를 사용하여 상품 정보 가져오기
     const products = await this.productService.getProductsByIds(productIds);
+    // 각 주문 항목에 대해 반복하면서 총 주문 금액 계산
     for (const item of orderItems) {
+      // 상품 ID로 해당 상품 찾기
       const product = products.find((p) => p.id === item.productId);
+      // 상품 존재 X 예외 처리
       if (!product) {
         throw new BusinessException(
           'payment',
@@ -80,6 +88,7 @@ export class PaymentService {
           HttpStatus.BAD_REQUEST,
         );
       }
+      // 총 주문 금액 처리
       totalAmount += product.price * item.quantity;
     }
 
@@ -92,15 +101,19 @@ export class PaymentService {
     couponId?: string,
     pointAmountToUse?: number,
   ): Promise<number> {
+    // 쿠폰 id가 존재하는 경우 할인 금액 계산
     const couponDiscount = couponId
       ? await this.applyCoupon(couponId, userId, totalAmount)
       : 0;
+
+    // 포인트 사용량 존재하는 경우 할인 금액 계산
     const pointDiscount = pointAmountToUse
       ? await this.applyPoints(pointAmountToUse, userId)
       : 0;
 
     // 최종 금액 계산
     const finalAmount = totalAmount - (couponDiscount + pointDiscount);
+    // 최종 금액 - 인 경우 0 설정
     return finalAmount < 0 ? 0 : finalAmount;
   }
 
@@ -109,13 +122,14 @@ export class PaymentService {
     userId: string,
     totalAmount: number,
   ): Promise<number> {
+    // 주어진 쿠폰id 와 사용자 id 기반 쿠폰 조회
     const issuedCoupon = await this.issuedCouponRepository.findOne({
       where: {
         coupon: { id: couponId },
         user: { id: userId },
       },
     });
-
+    // 발급된 쿠폰 X 시 예외 처리
     if (!issuedCoupon) {
       throw new BusinessException(
         'payment',
@@ -124,7 +138,7 @@ export class PaymentService {
         HttpStatus.BAD_REQUEST,
       );
     }
-
+    // 쿠폰 유효성 확인
     const isValid =
       issuedCoupon?.isValid &&
       issuedCoupon?.validFrom <= new Date() &&
@@ -137,13 +151,14 @@ export class PaymentService {
         HttpStatus.BAD_REQUEST,
       );
     }
-
+    // 쿠폰 유형에 따라 할인 금액 계산
     const { coupon } = issuedCoupon;
     if (coupon.type === 'percent') {
       return (totalAmount * coupon.value) / 100;
     } else if (coupon.type === 'fixed') {
       return coupon.value;
     }
+    // 기타 유형의 경우 0 반환
     return 0;
   }
 
@@ -151,9 +166,11 @@ export class PaymentService {
     pointAmountToUse: number,
     userId: string,
   ): Promise<number> {
+    // 사용자 id 기반 사용 가능 포인트 조회
     const point = await this.pointRepository.findOne({
       where: { user: { id: userId } },
     });
+    // 조회된 포인트가 없거나 사용 가능한 포인트 < 요청한 포인트 시 예외 처리
     if (point.availableAmount < 0 || point.availableAmount < pointAmountToUse) {
       throw new BusinessException(
         'payment',
@@ -162,7 +179,7 @@ export class PaymentService {
         HttpStatus.BAD_REQUEST,
       );
     }
-
+    // 요청한 포인트 값 반환
     return pointAmountToUse;
   }
 }

@@ -16,8 +16,8 @@ export class ShippingInfoRepository extends Repository<ShippingInfo> {
 
   async createShippingInfo(shippingAddress: string): Promise<ShippingInfo> {
     const shippingInfo = new ShippingInfo();
-    shippingInfo.address = shippingAddress;
-    shippingInfo.status = 'ordered';
-    return this.entityManager.save(shippingInfo);
+    shippingInfo.address = shippingAddress; // 주소 설정
+    shippingInfo.status = 'ordered'; // 상태 설정
+    return this.entityManager.save(shippingInfo); // 배송 정보 저장
   }
 }

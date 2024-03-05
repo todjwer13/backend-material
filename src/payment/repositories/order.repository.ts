@@ -26,20 +26,25 @@ export class OrderRepository extends Repository<Order> {
     finalAmount: number,
     shippingInfo?: ShippingInfo,
   ): Promise<Order> {
+    // userId로 사용자 찾기
     const user = await this.userRepository.findOne({ where: { id: userId } });
+    // 주문 생성
     const order = new Order();
     order.user = user;
     order.amount = finalAmount;
     order.status = 'started';
     order.items = orderItems;
     order.shippingInfo = shippingInfo;
+    // 주문 저장 후 반환
     return this.save(order);
   }
 
   async completeOrder(orderId: string): Promise<Order> {
+    // orderId로 주문 찾기
     const order = await this.findOne({ where: { id: orderId } });
+    // 주문 상태 paid로 변경
     order.status = 'paid';
-
+    // 사용된 쿠폰 사용 처리 및 쿠폰 적용
     await Promise.all([
       this.issuedCouponRepository.use(order.usedIssuedCoupon),
       this.pointRepository.use(
@@ -48,6 +53,7 @@ export class OrderRepository extends Repository<Order> {
         '주문 사용',
       ),
     ]);
+    // 변경된 주문 정보 저장 및 반환
     return this.save(order);
   }
 }

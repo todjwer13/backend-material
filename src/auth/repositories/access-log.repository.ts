@@ -13,7 +13,7 @@ export class AccessLogRepository extends Repository<AccessLog> {
   ) {
     super(repo.target, repo.manager, repo.queryRunner);
   }
-
+  // 접근 로그 생성
   async createAccessLog(user: User, ua: string, endpoint: string, ip: string) {
     const accessLog = new AccessLog();
     accessLog.user = user;

@@ -13,7 +13,7 @@ export class RefreshTokenRepository extends Repository<RefreshToken> {
   ) {
     super(repo.target, repo.manager, repo.queryRunner);
   }
-
+  // 리프레시 토큰을 저장
   async saveRefreshToken(
     jti: string,
     user: User,
